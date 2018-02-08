@@ -1,0 +1,84 @@
+= Bitbucket project synchronizer
+
+This utility allows to either `git clone` or `git pull --rebase --prune` repositories inside a
+bitbucket _project_.
+
+== Usage
+
+[source,sh]
+----
+➜ ./bitb-project-sync --help
+Usage of ./bitb-project-sync:
+  -dry-run
+        Perform dry run
+  -from-file string
+        A json document matching the repos Bitbucket REST api, incompatible with --project-url
+  -project-url string
+        The bitbucket url, incompatible with --from-file
+  -token-file string
+        The path of the readToken file, only used when HTTP request is made
+  -verbose
+        Log verbosely (default true)
+----
+
+This tool will extract which git repositories of a bitbucket project to synchronize. This tool assumes that
+
+ * the current working directory is the project root and that sub-directories of this folder matches the name of the
+   project's repositories.
+ * repositories name have the same folder name locally
+
+
+=== from the api
+
+Those repositories are found using either the Bitbucket API directly
+https://docs.atlassian.com/bitbucket-server/rest/5.7.0/bitbucket-rest.html#idm45568365953232[``GET /rest/api/1.0/projects/{projectKey}/repos``]
+and read the document listing all git repositories.
+
+
+[source,sh]
+----
+./bitb-project-sync --project-url https://authority/rest/api/1.0/projects/services/repos?limit=1
+----
+
+At this time the tool doesn't handle pagination, so the URI should be crafted to fetch all repositories.
+
+If the project is not public, then you can authenticate via an authorization token that can be
+https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html[created from your bitbucket account].
+
+In this case store the token in a file, then configure the tool to use it :
+
+[source,sh]
+----
+./bitb-project-sync \
+    --token-file ./path/to/the/token-file
+    --project-url https://authority/rest/api/1.0/projects/services/repos?limit=1
+----
+
+
+=== from a local json file
+
+This mode will read a local json document, this document is assumed to be the same document as the one returned by
+the Bitbucket REST API https://docs.atlassian.com/bitbucket-server/rest/5.7.0/bitbucket-rest.html#idm45568365953232[``GET /rest/api/1.0/projects/{projectKey}/repos``]
+
+[source,sh]
+----
+./bitb-project-sync --from-file project-repository.json
+----
+
+
+== Build it
+
+Simply do
+
+[source,sh]
+----
+go build bitb-project-sync.go
+----
+
+== A word about code quality
+
+This project has been started as a pet project to learn a bit about Go lang. This has been done in a matter of hours,
+but the code itself may not be of great quality as I don't grasp the Go lang idioms at this time.
+Also note there's no unit test. This a room for improvement that is for later.
+
+
