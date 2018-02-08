@@ -1,0 +1,50 @@
+{
+  "size": 1,
+  "limit": 25,
+  "isLastPage": false,
+  "values": [
+    {
+      "slug": "git-repo-name",
+      "id": 42,
+      "name": "git-repo-name",
+      "scmId": "git",
+      "state": "AVAILABLE",
+      "statusMessage": "Available",
+      "forkable": true,
+      "project": {
+        "key": "project-name",
+        "id": 704,
+        "name": "Services",
+        "public": false,
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "https://bitbucket/projects/project-name"
+            }
+          ]
+        }
+      },
+      "public": false,
+      "links": {
+        "clone": [
+          {
+            "href": "ssh://git@git.bitbucket/services/git-repo-name.git",
+            "name": "ssh"
+          },
+          {
+            "href": "https://user@bitbucket/scm/services/git-repo-name.git",
+            "name": "http"
+          }
+        ],
+        "self": [
+          {
+            "href": "https://bitbucket/projects/project-name/repos/git-repo-name/browse"
+          }
+        ]
+      }
+    }
+  ],
+  "start": 0,
+  "nextPageStart": 0
+}
