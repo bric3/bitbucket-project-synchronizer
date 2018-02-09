@@ -10,9 +10,9 @@ import (
 	"encoding/json"
 	"flag"
 	"strings"
-	//"syscall"
 	"os/exec"
-	//"fmt"
+	"path"
+	"path/filepath"
 )
 
 var verbose = flag.Bool("verbose", true, "Log verbosely")
@@ -22,6 +22,7 @@ func main() {
 	fromFile := flag.String("from-file", "", "A json document matching the repos Bitbucket REST api, incompatible with --project-url")
 	url := flag.String("project-url", "", "The bitbucket url, incompatible with --from-file")
 	tokenFile := flag.String("token-file", "", "The path of the readToken file, only used when HTTP request is made")
+	projectDir := flag.String("project-dir", currentWorkingDir(), "The path of the project directory, if none specified, use current working directory")
 	flag.Parse()
 
 	if (*fromFile == "" && *url == "") || (*fromFile != "" && *url != "") {
@@ -40,30 +41,29 @@ func main() {
 
 	gitUrls := collectGitUrls(payload)
 
-	cloneOrPull(gitUrls)
+	cloneOrPull(gitUrls, *projectDir)
 }
 
-func cloneOrPull(gitUrls map[string]string) {
-	//binary, lookErr := exec.LookPath("git")
-	//if lookErr != nil {
-	//	panic(lookErr)
-	//}
-	//env := os.Environ()
-
+func cloneOrPull(gitUrls map[string]string, projectDir string) {
+	if *verbose {
+		absolutePath, _ := filepath.Abs(projectDir)
+		log.Println("Using project dir : " + absolutePath)
+	}
 	for repoName, gitUrl := range gitUrls {
 		var args []string
-		if _, err := os.Stat(repoName); os.IsNotExist(err) {
+		if _, err := os.Stat(path.Join(projectDir, repoName)); os.IsNotExist(err) {
 			args = []string{
 				"git",
 				"clone",
 				gitUrl,
+				path.Join(projectDir, repoName),
 			}
 		} else {
 			// assuming repo has been cloned using default name
 			args = []string{
 				"git",
 				"--git-dir",
-				repoName + "/.git",
+				path.Join(projectDir, repoName, ".git"),
 				"pull",
 				"--rebase",
 				"--prune",
@@ -75,7 +75,9 @@ func cloneOrPull(gitUrls map[string]string) {
 			if *verbose {
 				log.Println(args)
 			}
-			output, err := exec.Command(args[0], args[1:]...).CombinedOutput()
+			command := exec.Command(args[0], args[1:]...)
+			//command.Dir = projectDir
+			output, err := command.CombinedOutput()
 			if err != nil {
 				os.Stderr.WriteString(err.Error())
 			}
@@ -183,6 +185,15 @@ func readPayload(Body io.ReadCloser) repositories {
 	}
 
 	return repos
+}
+
+
+func currentWorkingDir() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return dir
 }
 
 type project struct {

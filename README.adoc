@@ -13,6 +13,8 @@ Usage of ./bitb-project-sync:
         Perform dry run
   -from-file string
         A json document matching the repos Bitbucket REST api, incompatible with --project-url
+  -project-dir string
+        The path of the project directory, if none specified, use current working directory (default "<current dir>")
   -project-url string
         The bitbucket url, incompatible with --from-file
   -token-file string
