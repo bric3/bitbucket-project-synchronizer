@@ -20,7 +20,7 @@ Usage of ./bitb-project-sync:
   -token-file string
         The path of the readToken file, only used when HTTP request is made
   -verbose
-        Log verbosely (default true)
+        Log verbosely
 ----
 
 This tool will extract which git repositories of a bitbucket project to synchronize. This tool assumes that

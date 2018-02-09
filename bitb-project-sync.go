@@ -15,7 +15,7 @@ import (
 	"path/filepath"
 )
 
-var verbose = flag.Bool("verbose", true, "Log verbosely")
+var verbose = flag.Bool("verbose", false, "Log verbosely")
 var dryRun = flag.Bool("dry-run", false, "Perform dry run")
 
 func main() {
